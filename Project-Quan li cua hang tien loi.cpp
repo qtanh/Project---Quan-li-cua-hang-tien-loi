@@ -2,11 +2,12 @@
 #include<string.h>
 #include<stdlib.h>
 #include<ctype.h>
+#include<math.h>
 int size =0;
 typedef struct Transaction{
 	char transId[20];
-	char productId[10];
-	char type[5];
+	int imp;
+	int exp;
 	char date[15];
 };
 typedef struct Product{
@@ -63,7 +64,7 @@ void enter(Product *pro, int index){
         pro[index].productId[strcspn(pro[index].productId, "\n")] = '\0';
 
         if (strlen(pro[index].productId) == 0) {
-            printf("Id should not be blanked\n");
+            printf("Id should not be blank or only space\n");
             isValid = 0;
         } 
         else if (isDup(pro, pro[index].productId)) { 
@@ -76,7 +77,7 @@ void enter(Product *pro, int index){
         fgets(pro[index].name, sizeof(pro[index].name), stdin);
         pro[index].name[strcspn(pro[index].name, "\n")] = 0;
         if (strlen(pro[index].name) == 0) {
-            printf("Name information should not be blanked\n");
+            printf("Name information should not be blank or contains only space\n");
         }
     } while (strlen(pro[index].name) == 0);
     do {
@@ -84,7 +85,7 @@ void enter(Product *pro, int index){
         fgets(pro[index].unit, sizeof(pro[index].unit), stdin);
         pro[index].unit[strcspn(pro[index].unit, "\n")] = 0;
         if (strlen(pro[index].unit) == 0) {
-            printf("You can not leave unit description empty\n");
+            printf("You can not leave unit description empty or only space\n");
         }
     } while (strlen(pro[index].unit) == 0);
     do{
@@ -104,27 +105,44 @@ void addProduct(Product *pro) {
     int n;
     printf("Limit: ");
     scanf("%d",&n);
-    fflush(stdin);
+    clearInputBuffer();
     if (n < 0) n = 0;
-
     for (int i = 0; i < n; i++) {
         enter(pro, size);
     }
 }
 void upd(Product *pro){
-	 fflush(stdin);
+	 clearInputBuffer();
 	char position[10];
+	do{
         printf("Enter id of the product that you want to update description: "); 
         fgets(position,sizeof(position),stdin);
         position[strcspn(position,"\n")]=0;
+        if(strlen(position)==0){
+		printf("Id should not be blank or space");
+	}else{
+		break;
+	}
+}while(1);
 	for(int i = 0;i<size;i++){
 		if(strcmp(pro[i].productId,position)==0){
-			printf("Name: ");
-			fgets(pro[i].name,sizeof(pro[i].name),stdin);
+			 do {
+        printf("Name: ");
+        fgets(pro[i].name, sizeof(pro[i].name), stdin);
+        pro[i].name[strcspn(pro[i].name, "\n")] = 0;
+        if (strlen(pro[i].name) == 0) {
+            printf("Name information should not be blank or contains only space\n");
+        }
+    } while (strlen(pro[i].name) == 0);
 			pro[i].name[strcspn(pro[i].name,"\n")]=0;
-			printf("Unit: ");
-			fgets(pro[i].unit,sizeof(pro[i].unit),stdin);
-			pro[i].unit[strcspn(pro[i].unit,"\n")]=0;
+		do {
+        printf("Unit: ");
+        fgets(pro[i].unit, sizeof(pro[i].unit), stdin);
+        pro[i].unit[strcspn(pro[i].unit, "\n")] = 0;
+        if (strlen(pro[i].unit) == 0) {
+            printf("You can not leave unit description empty or only space\n");
+        }
+    } while (strlen(pro[i].unit) == 0);
 			 do{
 				printf("Quantity: ");
 				if(scanf("%d",&pro[i].quantity)!=1){
@@ -140,7 +158,7 @@ void upd(Product *pro){
 	}
 }
 void showup(Product *pro, int *n){
-	int p,c;
+	int p,pick;
 	 do{
 				printf("Product per page ");
 				if(scanf("%d",&p)!=1){
@@ -151,37 +169,77 @@ void showup(Product *pro, int *n){
 				break;
 			}
 		}while(1);
-	 do{
-				printf("The page that you want to entered: ");
-				if(scanf("%d",&c)!=1){
+	int perPage = p;
+	int current = 1;
+	int totalProducts = *n; 
+	int totalPages = 1;
+    if (totalProducts > 0) {
+        totalPages = (int)ceil((double)totalProducts / perPage);
+    }
+    	do{
+	int start = (current  - 1)*perPage;
+	int end = start +perPage;
+	if (end > totalProducts) {
+            end = totalProducts;
+        }
+		printf("\n||=============================Library==================================||\n");
+		printf("||======================================================================||\n");
+	for(int i =start;i<end;i++){
+		printf("|| 	ID: %s|Name: %s|Quantity: %d|Unit: %s|Status: ",pro[i].productId,pro[i].name,pro[i].quantity,pro[i].unit);
+		if(pro[i].status==1){
+			printf("	Usable  	||");
+			printf("\n");
+		}else{
+			printf("	Locked  	||");
+			printf("\n");
+		}
+	}
+		printf("||======================================================================||\n");
+		printf("||  Current page: %d			Total pages:	     	  %d     ||\n",current,totalProducts);
+		printf("||======================================================================||\n");
+		printf("||	1.Previous	|	2.Next		|	3.Exit		||\n");
+		printf("||======================================================================||\n");
+				printf("Pick one: ");
+				if(scanf("%d",&pick)!=1){
 					printf("Please only use integer number for this list!\n");
 					clearInputBuffer();
 				}else{
 					clearInputBuffer();
-				break;
 			}
-		}while(1);
-	int perPage = p;
-	int current = c;
-	int start = (current  - 1)*perPage;
-	int end = start +perPage;
-	for(int i =start;i<end;i++){
-		printf("ID: %s|Name: %s|Quantity: %d|Unit: %s|Status: ",pro[i].productId,pro[i].name,pro[i].quantity,pro[i].unit);
-		if(pro[i].status==1){
-			printf("Usable");
-			printf("\n");
-		}else{
-			printf("Locked");
-			printf("\n");
+		switch (pick) {
+			case 1:
+				if (current >1) {
+					current--;
+					} else {
+					printf("You are already on the first page.\n");
+				}
+				break;
+			case 2:
+				if (current < totalPages) {
+					current++;
+					} else {
+					printf("You are already on the last page.\n");
+				}
+				break;
+				case 3: 
+				printf("Exiting product list view.\n");
+				break;
 		}
-	}
+	}while(pick!=3);
 }
 void manage(Product *pro, int *n){
 	fflush(stdin);
 	char position[10];
-	printf("Enter position where you want to manage status: ");
-	fgets(position,sizeof(position),stdin);
-	position[strcspn(position,"\n")]=0;
+do{
+        printf("Enter id of the product that you want to update description: "); 
+        fgets(position,sizeof(position),stdin);
+        position[strcspn(position,"\n")]=0;
+        if(strlen(position)==0){
+		printf("Id should not be blank or space");
+	}else{
+		break;
+	}
+}while(1);
 	for(int i =0;i<*n;i++){
 		if(strcmp(pro[i].productId,position)==0){
 				printf("\n===================================\n");
@@ -195,29 +253,55 @@ void manage(Product *pro, int *n){
 	}
 }
 void searchId(Product *pro,int *n){
-	fflush(stdin);
 	char find[50];
-	printf("Enter position where you want to find description: ");
+	int found = 0; 
+	do{
+	printf("Enter id of the product which you want to find its description: ");
 	fgets(find,sizeof(find),stdin);
 	find[strcspn(find,"\n")]=0;
+		clearInputBuffer();
+	if(strlen(find)==0){
+		printf("Id should not be blank or space");
+	}else{
+		break;
+	}
+}while(1);
 	for(int i =0;i<*n;i++){
 		if(strcmp(pro[i].productId,find)==0){
-			printf("ID: %s|Name: %s|Quantity: %d|Unit: %s|Status: %d",pro[i].productId,pro[i].name,pro[i].quantity,pro[i].unit,pro[i].status);
-		printf("\n");
+				printf("ID: %s|Name: %s|Quantity: %d|Unit: %s|Status: ",pro[i].productId,pro[i].name,pro[i].quantity,pro[i].unit);
+				found = 1;
+				break;
+		if(pro[i].status==1){
+			printf("Usable");
+			printf("\n");
+			
+		}else{
+			printf("Locked");
+			printf("\n");
+		}
 		break;
 		}
 	}
+	if(!found){
+		printf("Not found");
+	}
 }
 void searchName(Product *pro,int *n){
-	fflush(stdin);
+	clearInputBuffer();
 	char find[50];
 	printf("Enter the name you want to find description: ");
 	fgets(find,sizeof(find),stdin);
 	find[strcspn(find,"\n")]=0;
 	for(int i =0;i<*n;i++){
 		if(strstr(pro[i].name,find)){
-			printf("ID: %s|Name: %s|Quantity: %d|Unit: %s|Status: %d",pro[i].productId,pro[i].name,pro[i].quantity,pro[i].unit,pro[i].status);
-		printf("\n");
+					printf("ID: %s|Name: %s|Quantity: %d|Unit: %s|Status: ",pro[i].productId,pro[i].name,pro[i].quantity,pro[i].unit);
+		if(pro[i].status==1){
+			printf("Usable");
+			printf("\n");
+		}else{
+			printf("Locked");
+			printf("\n");
+		}
 		}
 	}
 }
@@ -232,30 +316,102 @@ void ascendAZ(Product *pro,int *n){
 			}
 		}
 	}
+	for(int i =0;i<*n;i++){
+		printf("|| 	ID: %s|Name: %s|Quantity: %d|Unit: %s|Status: ",pro[i].productId,pro[i].name,pro[i].quantity,pro[i].unit);
+		if(pro[i].status==1){
+			printf("	Usable  	||");
+			printf("\n");
+		}else{
+			printf("	Locked  	||");
+			printf("\n");
+		}
+	}
 }
 void ascendQuantity(Product *pro,int *n){
 	Product tmp;
 	for(int i=0;i<*n-1;i++){
 		for (int j = 0;j<*n-1-i;j++){
-			if(pro[j].quantity==pro[j+1].quantity){
+			if(pro[j].quantity>pro[j+1].quantity){
 				tmp = pro[j];
 				pro[j]=pro[j+1];
 				pro[j+1]=tmp;
 			}
 		}
 	}
+	for(int i =0;i<*n;i++){
+		printf("|| 	ID: %s|Name: %s|Quantity: %d|Unit: %s|Status: ",pro[i].productId,pro[i].name,pro[i].quantity,pro[i].unit);
+		if(pro[i].status==1){
+			printf("	Usable  	||");
+			printf("\n");
+		}else{
+			printf("	Locked  	||");
+			printf("\n");
+		}
+	}
 }
-//void removeSpace(char *string, int index){
-//	int length = strlen(string);
-//	for(int i = index; i <length - 1;i++){
-//		string[i] = string[i+1];
-//	}
-//	string[length-1] = '\0';
-//}
+void impo(Product *pro,int *n){
+			if(pro[i].status==1){
+			do{
+			printf("Put in the amount of products that you want to import: ");
+			if(scanf("%d",&pro.trans.imp)!=1){
+					printf("Please only use integer number for this list!\n");
+					clearInputBuffer();
+			}else if(pro.trans.imp<=0){
+				printf("The amount should be bigger than 0!");
+					clearInputBuffer();
+				}else{
+					clearInputBuffer();
+				break;
+			}
+		}while(1);
+		}else{
+			printf("The product need to be activated to import new quantity");
+	}
+	for(int i =0;i<*n;i++){
+	pro[i].quantity+=pro.trans.imp;
+	}
+}
+void expo(Product *pro,int *n){
+	if(pro[i].status==1){
+			do{
+			printf("Put in the amount of products that you want to export: ");
+			if(scanf("%d",&pro.trans.exp)!=1){
+					printf("Please only use integer number for this list!\n");
+					clearInputBuffer();
+			}else if(pro.trans.exp<=0){
+				printf("The amount should be bigger than 0!");
+					clearInputBuffer();
+				}else{
+					clearInputBuffer();
+				break;
+			}
+		}while(1);
+		}else{
+			printf("The product need to be activated to export new quantity");
+	}
+	for(int i =0;i<*n;i++){
+	pro[i].quantity-=pro.trans.exp;
+	}
+}
+void hisImpo(Product *pro,int *n){
+	for(int i =0;i<*n;i++){
+			do{
+	printf("Enter id of the product which you want to find its description: ");
+	fgets(find,sizeof(find),stdin);
+	find[strcspn(find,"\n")]=0;
+		clearInputBuffer();
+	if(strlen(find)==0){
+		printf("Id should not be blank or space");
+	}else{
+		break;
+	}
+}while(1);
+		
+	}
+}
 int main(){
-	int size =0;
-	Product pro[100];
-	int n,i,decision,j;
+	Product pro[100] ;
+	int n,i,decision;
 	int choice,selection,pick,get;
 do{
 		mainMenu();
@@ -311,15 +467,15 @@ do{
 					}while(1);
 						switch(selection){
 							case 1:
-								searchId(pro,&n);
+								searchId(pro,&size);
 								break;
 							case 2:
-								searchName(pro,&n);
+								searchName(pro,&size);
 								break;
 						}
 						break;
 					case 5:
-						showup(pro,&n);
+						showup(pro,&size);
 						break;
 					case 6:
 						printf("1. Arrange bases on alphabet\n");
@@ -336,10 +492,10 @@ do{
 					}while(1);
 						switch(choice){
 							case 1:
-								ascendAZ(pro,&n);
+								ascendAZ(pro,&size);
 								break;
 							case 2:
-								ascendQuantity(pro,&n);
+								ascendQuantity(pro,&size);
 								break;
 						}
 						break;

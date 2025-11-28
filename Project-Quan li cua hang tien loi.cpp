@@ -4,18 +4,31 @@
 #include<ctype.h>
 #include<math.h>
 int size =0;
+int transCount=0;
+typedef struct DateOfTransactionExp{
+	int dayExp;
+	int monthExp;
+	int yearExp;
+};
+typedef struct DateOfTransactionImp{
+	int dayImp;
+	int monthImp;
+	int yearImp;
+};
 typedef struct Transaction{
-	char transId[20];
+	char transIdImp[20];
+	char transIdExp[20];
 	int imp;
 	int exp;
-	char date[15];
+	DateOfTransactionImp doti;
+	DateOfTransactionExp dote;
 };
 typedef struct Product{
 	char productId[10];
 	char name[50];
 	char unit[10];
 	int quantity;
-	int status = 1;
+	int status;
 	Transaction trans;
 };
 void clearInputBuffer() {
@@ -46,6 +59,26 @@ void subMenu(){
 	printf("||                2.History of import and export                  ||\n");
 	printf("||                3.Back                                          ||\n");
 	printf("||================================================================||\n");
+}
+void initializeProducts(Product *pro) {
+    Product initialProducts[] = {
+        {"P001", "Gao Thom", "Bag", 150, 1, {"", "", 0, 0, {0,0,0}, {0,0,0}}},
+        {"P002", "Bot Mi", "Box", 80, 1, {"", "", 0, 0, {0,0,0}, {0,0,0}}},
+        {"P003", "Duong Kinh", "Kg", 200, 1, {"", "", 0, 0, {0,0,0}, {0,0,0}}},
+        {"P004", "Muoi Bien", "Kg", 300, 1, {"", "", 0, 0, {0,0,0}, {0,0,0}}},
+        {"P005", "Dau An", "Litre", 75, 1, {"", "", 0, 0, {0,0,0}, {0,0,0}}},
+        {"P006", "Ca Hop", "Can", 40, 1, {"", "", 0, 0, {0,0,0}, {0,0,0}}}, 
+        {"P007", "Mi Tom", "Pack", 500, 1, {"", "", 0, 0, {0,0,0}, {0,0,0}}},
+        {"P008", "Banh Quy", "Box", 120, 1, {"", "", 0, 0, {0,0,0}, {0,0,0}}},
+        {"P009", "Sua Tuoi", "Carton", 90, 1, {"", "", 0, 0, {0,0,0}, {0,0,0}}},
+        {"P010", "Nuoc Sot", "Bottle", 60, 1, {"", "", 0, 0, {0,0,0}, {0,0,0}}}
+    };
+
+    int numInitialProducts = 10;
+    for (int i = 0; i < numInitialProducts; i++) {
+        pro[i] = initialProducts[i];
+    }
+    size = numInitialProducts; 
 }
 int isDup(Product *pro, const char id[]){  
 	for (int i=0;i<size;i++){
@@ -182,23 +215,23 @@ void showup(Product *pro, int *n){
 	if (end > totalProducts) {
             end = totalProducts;
         }
-		printf("\n||=============================Library==================================||\n");
-		printf("||======================================================================||\n");
+		printf("\n||======================================================Library================================================||\n");
+		printf("||=============================================================================================================||\n");
 	for(int i =start;i<end;i++){
 		printf("|| 	ID: %s|Name: %s|Quantity: %d|Unit: %s|Status: ",pro[i].productId,pro[i].name,pro[i].quantity,pro[i].unit);
 		if(pro[i].status==1){
-			printf("	Usable  	||");
+			printf("	Usable  				||");
 			printf("\n");
 		}else{
-			printf("	Locked  	||");
+			printf("	Locked  				||");
 			printf("\n");
 		}
 	}
-		printf("||======================================================================||\n");
-		printf("||  Current page: %d			Total pages:	     	  %d     ||\n",current,totalProducts);
-		printf("||======================================================================||\n");
-		printf("||	1.Previous	|	2.Next		|	3.Exit		||\n");
-		printf("||======================================================================||\n");
+		printf("||=============================================================================================================||\n");
+		printf("||  Current page: %d				Total pages:	     	           %d     		       ||\n",current,totalProducts/perPage);
+		printf("||=============================================================================================================||\n");
+		printf("||		1.Previous		|		2.Next		|		3.Exit		       ||\n");
+		printf("||=============================================================================================================||\n");
 				printf("Pick one: ");
 				if(scanf("%d",&pick)!=1){
 					printf("Please only use integer number for this list!\n");
@@ -228,7 +261,7 @@ void showup(Product *pro, int *n){
 	}while(pick!=3);
 }
 void manage(Product *pro, int *n){
-	fflush(stdin);
+	clearInputBuffer();
 	char position[10];
 do{
         printf("Enter id of the product that you want to update description: "); 
@@ -269,8 +302,7 @@ void searchId(Product *pro,int *n){
 	for(int i =0;i<*n;i++){
 		if(strcmp(pro[i].productId,find)==0){
 				printf("ID: %s|Name: %s|Quantity: %d|Unit: %s|Status: ",pro[i].productId,pro[i].name,pro[i].quantity,pro[i].unit);
-				found = 1;
-				break;
+				
 		if(pro[i].status==1){
 			printf("Usable");
 			printf("\n");
@@ -279,7 +311,8 @@ void searchId(Product *pro,int *n){
 			printf("Locked");
 			printf("\n");
 		}
-		break;
+		found = 1;
+				break;
 		}
 	}
 	if(!found){
@@ -350,53 +383,10 @@ void ascendQuantity(Product *pro,int *n){
 	}
 }
 void impo(Product *pro,int *n){
-			if(pro[i].status==1){
-			do{
-			printf("Put in the amount of products that you want to import: ");
-			if(scanf("%d",&pro.trans.imp)!=1){
-					printf("Please only use integer number for this list!\n");
-					clearInputBuffer();
-			}else if(pro.trans.imp<=0){
-				printf("The amount should be bigger than 0!");
-					clearInputBuffer();
-				}else{
-					clearInputBuffer();
-				break;
-			}
-		}while(1);
-		}else{
-			printf("The product need to be activated to import new quantity");
-	}
-	for(int i =0;i<*n;i++){
-	pro[i].quantity+=pro.trans.imp;
-	}
-}
-void expo(Product *pro,int *n){
-	if(pro[i].status==1){
-			do{
-			printf("Put in the amount of products that you want to export: ");
-			if(scanf("%d",&pro.trans.exp)!=1){
-					printf("Please only use integer number for this list!\n");
-					clearInputBuffer();
-			}else if(pro.trans.exp<=0){
-				printf("The amount should be bigger than 0!");
-					clearInputBuffer();
-				}else{
-					clearInputBuffer();
-				break;
-			}
-		}while(1);
-		}else{
-			printf("The product need to be activated to export new quantity");
-	}
-	for(int i =0;i<*n;i++){
-	pro[i].quantity-=pro.trans.exp;
-	}
-}
-void hisImpo(Product *pro,int *n){
-	for(int i =0;i<*n;i++){
-			do{
-	printf("Enter id of the product which you want to find its description: ");
+		char find[50];
+		int found =0;
+	do{
+	printf("Enter id of the product which you want to import: ");
 	fgets(find,sizeof(find),stdin);
 	find[strcspn(find,"\n")]=0;
 		clearInputBuffer();
@@ -406,13 +396,206 @@ void hisImpo(Product *pro,int *n){
 		break;
 	}
 }while(1);
-		
+		for(int i =0;i<*n;i++){
+			if(strcmp(pro[i].productId,find)==0){
+				found = 1;
+			if(pro[i].status==1){
+			do{
+			printf("Put in the amount of products that you want to import: ");
+			if(scanf("%d",&pro[i].trans.imp)!=1){
+					printf("Please only use integer number for this list!\n");
+					clearInputBuffer();
+			}else if(pro[i].trans.imp<=0){
+				printf("The amount should be bigger than 0!");
+					clearInputBuffer();
+				}else{
+					pro[i].quantity+=pro[i].trans.imp;
+					strcpy(pro[i].trans.transIdImp,pro[i].productId);
+					clearInputBuffer();
+				break;
+			}
+		}while(1);
+	do{
+			printf("Day of import: ");
+			if(scanf("%d",&pro[i].trans.doti.dayImp)!=1){
+					printf("Please only use integer number for this list !\n");
+					clearInputBuffer();
+			}else if(pro[i].trans.doti.dayImp<=0||pro[i].trans.doti.dayImp>31){
+				printf("Day must be from 1 to 31!\n");
+					clearInputBuffer();
+				}else{
+					clearInputBuffer();
+				break;
+			}
+		}while(1);
+			do{
+			printf("Month of import: ");
+			if(scanf("%d",&pro[i].trans.doti.monthImp)!=1){
+					printf("Please only use integer number for this list!\n");
+					clearInputBuffer();
+			}else if(pro[i].trans.doti.monthImp<=0||pro[i].trans.doti.monthImp>31){
+				printf("Month should be from 1-12!\n");
+					clearInputBuffer();
+				}else{
+					clearInputBuffer();
+				break;
+			}
+		}while(1);
+			do{
+			printf("Year of import: ");
+			if(scanf("%d",&pro[i].trans.doti.yearImp)!=1){
+					printf("Please only use integer number for this list!\n");
+					clearInputBuffer();
+			}else if(pro[i].trans.doti.yearImp<=0){
+				printf("Year should be bigger than 0!");
+					clearInputBuffer();
+				}else{
+					clearInputBuffer();
+				break;
+			}
+		}while(1);
+		break;
+			}else{
+			printf("The product need to be activated to import new quantity");
+			break;
 	}
+	}
+	}
+	if(!found){
+		printf("Not found");
+	} 
+						transCount++;
+}
+void expo(Product *pro,int *n){
+	char find[50];
+	int found =0;
+	do{
+	printf("Enter id of the product which you want to export: ");
+	fgets(find,sizeof(find),stdin);
+	find[strcspn(find,"\n")]=0;
+		clearInputBuffer();
+	if(strlen(find)==0){
+		printf("Id should not be blank or space");
+	}else{
+		break;
+	}
+}while(1);
+	for(int i =0;i<*n;i++){
+	if(strcmp(pro[i].productId,find)==0){
+		found = 1;
+		if(pro[i].status==1){
+			do{
+			printf("Put in the amount of products that you want to export: ");
+			if(scanf("%d",&pro[i].trans.exp)!=1){
+					printf("Please only use integer number for this list!\n");
+					clearInputBuffer();
+			}else if(pro[i].trans.exp<=0){
+				printf("The amount should be bigger than 0!");
+					clearInputBuffer();
+				}else{
+					pro[i].quantity-=pro[i].trans.exp;
+					strcpy(pro[i].trans.transIdExp,pro[i].productId);
+					clearInputBuffer();
+				break;
+			}
+		}while(1);
+	do{
+			printf("Day of export: ");
+			if(scanf("%d",&pro[i].trans.dote.dayExp)!=1){
+					printf("Please only use integer number for this list!\n");
+					clearInputBuffer();
+			}else if(pro[i].trans.dote.dayExp<=0||pro[i].trans.dote.dayExp>=31){
+				printf("Day should be from 1 to 31!\n");
+					clearInputBuffer();
+				}else{
+					clearInputBuffer();
+				break;
+			}
+		}while(1);
+			do{
+			printf("Month of export: ");
+			if(scanf("%d",&pro[i].trans.dote.monthExp)!=1){
+					printf("Please only use integer number for this list!\n");
+					clearInputBuffer();
+			}else if(pro[i].trans.dote.monthExp<=0||pro[i].trans.dote.monthExp>12){
+				printf("Month should be from 1 to 12!\n");
+					clearInputBuffer();
+				}else{
+					clearInputBuffer();
+				break;
+			}
+		}while(1);
+			do{
+			printf("Year of export: ");
+			if(scanf("%d",&pro[i].trans.dote.yearExp)!=1){
+					printf("Please only use integer number for this list!\n");
+					clearInputBuffer();
+			}else if(pro[i].trans.dote.yearExp<=0){
+				printf("Year should be bigger than 0!");
+					clearInputBuffer();
+				}else{
+					clearInputBuffer();
+				break;
+			}
+		}while(1);
+			break;
+		}else{
+			printf("The product need to be activated to export new quantity");
+			break;
+	}
+	}
+	}
+		if(!found){	
+			printf("Not found");
+	} 
+						transCount++;
+}
+void hisImpo(Product *pro,int *n){
+	if(transCount==0){
+		printf("There is no transaction recently\n");
+	}else{
+	printf("\n||======================================================History of exportation================================================||\n");
+		printf("||===========================================================================================================================||\n");
+	for(int i =0;i<*n;i++){
+				printf("ID: %s|Name: %s|Quantity: %d|Unit: %s|Id of transaction: %s|Date of import: %d/%d/%d|Status: ",pro[i].productId,pro[i].name,pro[i].quantity,pro[i].unit,pro[i].trans.transIdImp,pro[i].trans.doti.dayImp,pro[i].trans.doti.monthImp,pro[i].trans.doti.yearImp);
+		if(pro[i].status==1){
+			printf("Usable");
+			printf("\n");
+			
+		}else{
+			printf("Locked");
+			printf("\n");
+		}
+		}
+		printf("||==========================================================================================================================||\n");
+	}
+	}
+void hisExpo(Product *pro,int *n){
+	if(transCount==0){
+		printf("There is no transaction recently\n");
+	}else{
+	printf("\n||======================================================History of importation================================================||\n");
+		printf("||===========================================================================================================================||\n");
+	for(int i =0;i<*n;i++){
+				printf("ID: %s|Name: %s|Quantity: %d|Unit: %s|Id of transaction: %s|Date of export: %d/%d/%d|Status: ",pro[i].productId,pro[i].name,pro[i].quantity,pro[i].unit,pro[i].trans.transIdExp,pro[i].trans.dote.dayExp,pro[i].trans.dote.monthExp,pro[i].trans.dote.yearExp);
+				
+		if(pro[i].status==1){
+			printf("Usable");
+			printf("\n");
+			
+		}else{
+			printf("Locked");
+			printf("\n");
+		}
+		printf("||=============================================================================================================================||\n");
+	}
+}
 }
 int main(){
 	Product pro[100] ;
 	int n,i,decision;
-	int choice,selection,pick,get;
+	int choice,selection,pick,get,take,set,grab;
+	initializeProducts(pro);
 do{
 		mainMenu();
 		do{
@@ -448,7 +631,7 @@ do{
 						upd(pro);
 						break;
 					case 3:
-						manage(pro,&n);
+						manage(pro,&size);
 						break;
 					case 4:
 						printf("\n==============================\n");
@@ -508,8 +691,8 @@ do{
 				do{
 		subMenu();
 		do{
-		printf("Get one: ");
-		if(scanf("%d",&get)!=1){
+		printf("Grab one: ");
+		if(scanf("%d",&grab)!=1){
 		printf("This menu only assits integer choices please choose it correctly!\n");	
 		clearInputBuffer();
 	}else{
@@ -517,17 +700,59 @@ do{
 		break;
 	}
 }while(1);
-		switch(decision){
+		switch(grab){
 			case 1:
-				
+						printf("\n==============================\n");
+						printf("||=======1.Import=======||\n");
+						printf("||=======2.Export=======||\n");
+						printf("==============================\n");
+						do{
+						printf("Your selection: ");
+						if(scanf("%d",&take)!=1){
+					printf("Please only use integer number for this list!\n");
+					clearInputBuffer();
+						}else{
+					clearInputBuffer();
+						break;
+						}
+					}while(1);
+					switch(take){
+						case 1:
+							impo(pro,&size);
+							break;
+						case 2:
+							expo(pro,&size);
+							break;
+					}
 				break;
 			case 2:
-				
+						printf("\n===============================\n");
+						printf("||=======1.Import history=======||\n");
+						printf("||=======2.Export history=======||\n");
+						printf("================================\n");
+						do{
+						printf("Your selection: ");
+						if(scanf("%d",&set)!=1){
+					printf("Please only use integer number for this list!\n");
+					clearInputBuffer();
+						}else{
+					clearInputBuffer();
+						break;
+						}
+					}while(1);
+					switch(set){
+						case 1:
+						hisImpo(pro,&size);
+						break;
+					case 2:
+						hisExpo(pro,&size);
+						break;
+					}
 				break;
 			case 3:
 				break;
 		}
-	}while(get!=3);
+	}while(grab!=3);
 				break;
 			case 3:
 				printf("Thanks for using!");

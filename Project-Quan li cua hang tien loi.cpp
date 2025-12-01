@@ -564,7 +564,7 @@ void hisImpo(Product *pro,int *n){
 	if(transCount==0){
 		printf("There is no transaction recently\n");
 	}else if(transCount>0){
-	printf("\n||======================================================History of exportation================================================||\n");
+	printf("\n||======================================================History of importation================================================||\n");
 		printf("||===========================================================================================================================||\n");
 	for(int i =0;i<*n;i++){
 				printf("ID: %s|Name: %s|Quantity: %d|Unit: %s|Id of transaction: %s|Date of import: %d/%d/%d|Status: ",pro[i].productId,pro[i].name,pro[i].quantity,pro[i].unit,pro[i].trans.transIdImp,pro[i].trans.doti.dayImp,pro[i].trans.doti.monthImp,pro[i].trans.doti.yearImp);
@@ -584,7 +584,7 @@ void hisExpo(Product *pro,int *n){
 	if(transCount==0){
 		printf("There is no transaction recently\n");
 	}else if(transCount>0){
-	printf("\n||======================================================History of importation================================================||\n");
+	printf("\n||======================================================History of exportation================================================||\n");
 		printf("||===========================================================================================================================||\n");
 	for(int i =0;i<*n;i++){
 				printf("ID: %s|Name: %s|Quantity: %d|Unit: %s|Id of transaction: %s|Date of export: %d/%d/%d|Status: ",pro[i].productId,pro[i].name,pro[i].quantity,pro[i].unit,pro[i].trans.transIdExp,pro[i].trans.dote.dayExp,pro[i].trans.dote.monthExp,pro[i].trans.dote.yearExp);
@@ -807,3 +807,4 @@ do{
 			}
 	}while(1);
 }
+

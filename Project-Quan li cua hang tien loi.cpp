@@ -37,27 +37,27 @@ void clearInputBuffer() {
 }
 void mainMenu(){
 	printf("\n||===================Gocery store management systems==================||\n");
-	printf("||                1.Products                                          ||\n");
-	printf("||                2.Import and export                                 ||\n");
-	printf("||                3.Exit                                              ||\n");
+	printf("||==============================1.Products============================||\n");
+	printf("||=========================2.Import and export========================||\n");
+	printf("||===============================3.Exit===============================||\n");
 	printf("||====================================================================||\n");
 };
 void assiMenu(){
 	printf("\n||=============Gocery store management systems-Product============||\n");
-	printf("||                       1.Add more products                      ||\n");
-	printf("||                       2.Update information                     ||\n");
-	printf("||                       3.Manage status                          ||\n");
-	printf("||                       4.Search                                 ||\n");
-	printf("||                       5.Print out the list                     ||\n");
-	printf("||                       6.Arrange list                           ||\n");
-	printf("||                       7.Back                                   ||\n");
+	printf("||=======================1.Add more products======================||\n");
+	printf("||=======================2.Update information=====================||\n");
+	printf("||=======================3.Manage status==========================||\n");
+	printf("||=======================4.Search=================================||\n");
+	printf("||=======================5.Print out the list=====================||\n");
+	printf("||=======================6.Arrange list===========================||\n");
+	printf("||=======================7.Back===================================||\n");
 	printf("||================================================================||\n");
 }
 void subMenu(){
 	printf("\n||=========Gocery store management systems-Import and export======||\n");
-	printf("||                1.Trading of import and export                  ||\n");
-	printf("||                2.History of import and export                  ||\n");
-	printf("||                3.Back                                          ||\n");
+	printf("||================1.Trading of import and export==================||\n");
+	printf("||================2.History of import and export==================||\n");
+	printf("||================3.Back==========================================||\n");
 	printf("||================================================================||\n");
 }
 void initializeProducts(Product *pro) {
@@ -135,14 +135,8 @@ void enter(Product *pro, int index){
     size++;
 }
 void addProduct(Product *pro) {
-    int n;
-    printf("Limit: ");
-    scanf("%d",&n);
-    clearInputBuffer();
-    if (n < 0) n = 0;
-    for (int i = 0; i < n; i++) {
+        clearInputBuffer();
         enter(pro, size);
-    }
 }
 void upd(Product *pro){
 	 clearInputBuffer();
@@ -191,18 +185,8 @@ void upd(Product *pro){
 	}
 }
 void showup(Product *pro, int *n){
-	int p,pick;
-	 do{
-				printf("Product per page ");
-				if(scanf("%d",&p)!=1){
-					printf("Please only use integer number for this list!\n");
-					clearInputBuffer();
-				}else{
-					clearInputBuffer();
-				break;
-			}
-		}while(1);
-	int perPage = p;
+	int pick;
+	int perPage = 2;
 	int current = 1;
 	int totalProducts = *n; 
 	int totalPages = 1;
@@ -230,7 +214,7 @@ void showup(Product *pro, int *n){
 		printf("||=============================================================================================================||\n");
 		printf("||  Current page: %d				Total pages:	     	           %d     		       ||\n",current,totalPages);
 		printf("||=============================================================================================================||\n");
-		printf("||		1.Previous		|		2.Next		|		3.Exit		       ||\n");
+		printf("||	1.Previous   	|	2.Next  	|	3.Custom   	|	4.Exit       		       ||\n");
 		printf("||=============================================================================================================||\n");
 				printf("Pick one: ");
 				if(scanf("%d",&pick)!=1){
@@ -254,11 +238,24 @@ void showup(Product *pro, int *n){
 					printf("You are already on the last page.\n");
 				}
 				break;
-				case 3: 
-				printf("Exiting product list view.\n");
+			case 3:
+				do{
+				printf("Product per page: ");
+				if(scanf("%d",&perPage)!=1){
+					printf("Please only use integer number for this list!\n");
+					clearInputBuffer();
+				}else{
+					totalPages = (int)ceil((double)totalProducts / perPage);
+					clearInputBuffer();
+				break;
+			}
+		}while(1);
+				break;
+			case 4: 
+				printf("See ya\n");
 				break;
 		}
-	}while(pick!=3);
+	}while(pick!=4);
 }
 void manage(Product *pro, int *n){
 	clearInputBuffer();
@@ -275,15 +272,28 @@ do{
 }while(1);
 	for(int i =0;i<*n;i++){
 		if(strcmp(pro[i].productId,position)==0){
+					do{
 				printf("\n===================================\n");
-				printf("||            0.Lock             ||\n");
-				printf("||            1.Usable           ||\n");
+				printf("||=============0.Lock============||\n");
+				printf("||===========1.Activate==========||\n");
 				printf("===================================\n");
 				printf("Status(0 for lock,1 for usable items): ");
 			scanf("%d",&pro[i].status);
-			break;
-		}
+			if(pro[i].status==1){
+				printf("Product is activated");
+				clearInputBuffer();
+				break; 
+			}else if(pro[i].status==0){
+				printf("Product is locked");
+				clearInputBuffer();
+				break; 
+			}else{
+				printf("Please only enter 0 or 1 for status!");
+				clearInputBuffer();
+			}	 
+		}while(1);
 	}
+}
 }
 void searchId(Product *pro,int *n){
 	char find[50];
@@ -553,7 +563,7 @@ void expo(Product *pro,int *n){
 void hisImpo(Product *pro,int *n){
 	if(transCount==0){
 		printf("There is no transaction recently\n");
-	}else{
+	}else if(transCount>0){
 	printf("\n||======================================================History of exportation================================================||\n");
 		printf("||===========================================================================================================================||\n");
 	for(int i =0;i<*n;i++){
@@ -573,7 +583,7 @@ void hisImpo(Product *pro,int *n){
 void hisExpo(Product *pro,int *n){
 	if(transCount==0){
 		printf("There is no transaction recently\n");
-	}else{
+	}else if(transCount>0){
 	printf("\n||======================================================History of importation================================================||\n");
 		printf("||===========================================================================================================================||\n");
 	for(int i =0;i<*n;i++){
@@ -593,7 +603,7 @@ void hisExpo(Product *pro,int *n){
 }
 int main(){
 	Product pro[100] ;
-	int n,i,decision;
+	int n,i,decision; 
 	int choice,selection,pick,get,take,set,grab;
 	initializeProducts(pro);
 do{
@@ -602,7 +612,9 @@ do{
 		printf("Your decision: ");
 		if(scanf("%d",&decision)!=1){
 			printf("Please only put in integer number!\n");
-			clearInputBuffer();           
+			clearInputBuffer();   
+		}else if(decision<=0||decision>3){
+			printf("Please only enter number in the range from 1 to 3!\n");
 		}else{
 			clearInputBuffer();
 			break;
@@ -617,6 +629,8 @@ do{
 				if(scanf("%d",&pick)!=1){
 					printf("Please only use integer number for this list!\n");
 					clearInputBuffer();
+				}else if(pick<=0||pick>7){
+					printf("Please only enter number in the range from 1 to 7!\n");
 				}else{
 					clearInputBuffer();
 				break;
@@ -634,15 +648,19 @@ do{
 						manage(pro,&size);
 						break;
 					case 4:
+						do{
 						printf("\n==============================\n");
 						printf("||=======1.Search by Id=======||\n");
 						printf("||======2.Search by Name======||\n");
+						printf("||===========3.Back===========||\n");
 						printf("==============================\n");
 						do{
 						printf("Your selection: ");
 						if(scanf("%d",&selection)!=1){
 					printf("Please only use integer number for this list!\n");
 					clearInputBuffer();
+					}else if(selection<=0||selection>3){
+					printf("Please only enter number in the range from 1 to 3!\n");
 						}else{
 					clearInputBuffer();
 						break;
@@ -655,19 +673,28 @@ do{
 							case 2:
 								searchName(pro,&size);
 								break;
+							case 3:
+								break;
 						}
+						}while(selection!=3);
 						break;
 					case 5:
 						showup(pro,&size);
 						break;
 					case 6:
-						printf("1. Arrange bases on alphabet\n");
-						printf("2.Arrange base on amount\n");
+						do{
+						printf("==============Arrange menu==========\n");
+						printf("||==1. Arrange bases on alphabet==||\n");
+						printf("||====2.Arrange base on amount====||\n");
+						printf("||==============3.Back============||\n");
+						printf("====================================\n");
 						do{
 						printf("Your choice: ");
 						if(scanf("%d",&choice)!=1){
 					printf("Please only use integer number for this list!\n");
 					clearInputBuffer();
+					}else if(choice<=0||choice>3){
+					printf("Please only enter number in the range from 1 to 3!\n");
 						}else{
 					clearInputBuffer();
 						break;
@@ -680,7 +707,10 @@ do{
 							case 2:
 								ascendQuantity(pro,&size);
 								break;
-						}
+							case 3:
+								break;
+					}
+					}while(choice!=3);
 						break;
 					case 7:
 					break;
@@ -695,6 +725,8 @@ do{
 		if(scanf("%d",&grab)!=1){
 		printf("This menu only assits integer choices please choose it correctly!\n");	
 		clearInputBuffer();
+	}else if(grab<=0||grab>3){
+		printf("Please only enter number in the range from 1 to 3!\n");
 	}else{
 		clearInputBuffer();
 		break;
@@ -702,15 +734,19 @@ do{
 }while(1);
 		switch(grab){
 			case 1:
-						printf("\n==============================\n");
+				do{
+						printf("\n==========================\n");
 						printf("||=======1.Import=======||\n");
 						printf("||=======2.Export=======||\n");
-						printf("==============================\n");
+						printf("||========3.Back========||\n");
+						printf("==========================\n");
 						do{
 						printf("Your selection: ");
 						if(scanf("%d",&take)!=1){
 					printf("Please only use integer number for this list!\n");
 					clearInputBuffer();
+					}else if(take<=0||take>3){
+					printf("Please only enter number in the range from 1 to 2!\n");
 						}else{
 					clearInputBuffer();
 						break;
@@ -723,18 +759,25 @@ do{
 						case 2:
 							expo(pro,&size);
 							break;
-					}
+						case 3:
+							break;
+						}
+					}while(take!=3);
 				break;
 			case 2:
-						printf("\n===============================\n");
+				do{
+						printf("\n==================================\n");
 						printf("||=======1.Import history=======||\n");
 						printf("||=======2.Export history=======||\n");
-						printf("================================\n");
+						printf("||============3.Back============||\n");
+						printf("==================================\n");
 						do{
 						printf("Your selection: ");
 						if(scanf("%d",&set)!=1){
 					printf("Please only use integer number for this list!\n");
 					clearInputBuffer();
+					}else if(set<=0||set>3){
+					printf("Please only enter number in the range from 1 to 3!\n");
 						}else{
 					clearInputBuffer();
 						break;
@@ -747,7 +790,10 @@ do{
 					case 2:
 						hisExpo(pro,&size);
 						break;
+					case 3:
+						break;
 					}
+					}while(set!=3);
 				break;
 			case 3:
 				break;
@@ -761,4 +807,3 @@ do{
 			}
 	}while(1);
 }
-
